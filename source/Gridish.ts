@@ -49,12 +49,12 @@ export class Gridish {
 
     }
 
-    public enable() {
+    public init() {
         document.addEventListener('keydown', this.listener = (event) => { this.toggleChecker(event) }, false)
         this.createGrid(this.options)
     }
 
-    public disable() {
+    public destroy() {
 
         if (!this.listener) {
             return

@@ -1,15 +1,13 @@
 {
   "name": "css-gridish-grid",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Only the Grid from IBM/css-gridish as an NPM module",
   "main": "./distribution/gridish.min.js",
   "files": [
     "distribution/**/*.js",
     "declaration/**/*.d.ts"
   ],
-  "types": [
-    "declaration/**/*.d.ts"
-  ],
+  "types": "declaration/Gridish.d.ts",
   "scripts": {
     "prepublish": "npm run build",
     "build": "tsc webpack.config.ts && webpack"

@@ -9,8 +9,9 @@ npm install css-gridish-grid -D
 ```javascript
 import { Gridish } from 'css-gridish-grid'
 
-const grid = new Gridish(options?)
-
-grid.enable()
-grid.disable()
+if (process.env.DEBUG) {
+    const grid = new Gridish( require('../css-gridish.json') )
+    grid.init()
+    //grid.destroy()
+}
 ```
