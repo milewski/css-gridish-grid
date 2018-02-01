@@ -1,0 +1,21 @@
+{
+  "compilerOptions": {
+    "module": "commonjs",
+    "target": "es5",
+    "sourceMap": true,
+    "declaration": true,
+    "declarationDir": "declaration",
+    "newLine": "LF",
+    "lib": [
+      "es2015",
+      "es2017",
+      "dom"
+    ]
+  },
+  "exclude": [
+    "webpack.config.ts",
+    "node_modules",
+    "distribution",
+    "declaration"
+  ]
+}

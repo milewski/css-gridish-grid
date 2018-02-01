@@ -1,0 +1,8 @@
+.DS_Store
+.idea
+
+*.log
+*.js
+*.map
+declaration
+node_modules

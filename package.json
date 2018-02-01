@@ -1,0 +1,25 @@
+{
+  "name": "css-gridish-grid",
+  "version": "1.0.0",
+  "description": "Only the Grid from IBM/css-gridish as an NPM module",
+  "main": "./distribution/gridish.min.js",
+  "files": [
+    "distribution/**/*.js",
+    "declaration/**/*.d.ts"
+  ],
+  "types": [
+    "declaration/**/*.d.ts"
+  ],
+  "scripts": {
+    "prepublish": "npm run build",
+    "build": "tsc webpack.config.ts && webpack"
+  },
+  "author": "Rafael Milewski",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/node": "^9.4.0",
+    "ts-loader": "^3.4.0",
+    "typescript": "^2.7.1",
+    "webpack": "^3.10.0"
+  }
+}
