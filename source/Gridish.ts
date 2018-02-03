@@ -1,6 +1,6 @@
 import { GridOptions } from './Interfaces'
 
-export class Gridish {
+export default class Gridish {
 
     private checker = document.createElement('div')
     private checkerStyle = document.createElement('style')
@@ -38,7 +38,7 @@ export class Gridish {
 
     private listener: (event: KeyboardEvent) => void
 
-    constructor(options: GridOptions) {
+    constructor(options: Partial<GridOptions> = {}) {
 
         this.options = { ...this.options, ...options }
 
@@ -207,3 +207,5 @@ export class Gridish {
     }
 
 }
+
+export { Gridish }

@@ -1,23 +1,29 @@
 {
   "name": "css-gridish-grid",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Only the Grid from IBM/css-gridish as an NPM module",
-  "main": "./distribution/gridish.min.js",
+  "main": "./distribution/main/gridish.min.js",
+  "module": "./distribution/module/gridish.min.js",
   "files": [
     "distribution/**/*.js",
     "declaration/**/*.d.ts"
   ],
   "types": "declaration/Gridish.d.ts",
   "scripts": {
-    "prepublish": "npm run build",
-    "build": "tsc webpack.config.ts && webpack"
+    "prepublish": "npm run compile",
+    "precompile": "rm -rf distribution/ && rm -rf declaration/",
+    "compile": "LIB=Gridish MODULE_DIR=distribution/modules MAIN_DIR=distribution/main run-s compile:* prepare-distribution",
+    "compile:module": "tsc --module es2015 --target es2015 --outDir $MODULE_DIR && npm run minify -- -o $MODULE_DIR/$LIB.min.js -- $MODULE_DIR/$LIB.js",
+    "compile:main": "tsc --module commonjs --target es5 --outDir $MAIN_DIR && npm run minify -- -o $MAIN_DIR/$LIB.min.js -- $MAIN_DIR/$LIB.js",
+    "prepare-distribution": "for file in distribution/**/*; do sed -i \"s/$LIB.js/${LIB,,}.js/gi\" $file && mv -v $file `echo ${file,,}`; done;",
+    "minify": "uglifyjs --compress --mangle --source-map"
   },
   "author": "Rafael Milewski",
   "license": "MIT",
   "devDependencies": {
     "@types/node": "^9.4.0",
-    "ts-loader": "^3.4.0",
+    "npm-run-all": "^4.1.2",
     "typescript": "^2.7.1",
-    "webpack": "^3.10.0"
+    "uglify-es": "^3.3.9"
   }
 }
