@@ -4,7 +4,9 @@
 [![npm downloads](https://img.shields.io/npm/dm/css-gridish-grid.svg)](https://www.npmjs.com/package/css-gridish-grid)
 [![dependencies](https://david-dm.org/milewski/css-gridish-grid.svg)](https://www.npmjs.com/package/css-gridish-grid)
 
-This package is a standalone version of the grid provided as an chrome extension by: https://github.com/IBM/css-gridish/ the purpose of this lib is to make the local development easier by having the grid packed locally in your project, and any one in the team can preview without any further installation.  
+This package is a standalone version of the grid provided as an chrome extension by: https://github.com/IBM/css-gridish/
+the purpose of this lib is to make the local development easier by having the grid packed locally in your project, so anyone 
+in the team can preview without any further installation.  
 
 # Install
 
