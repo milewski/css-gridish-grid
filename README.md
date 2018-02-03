@@ -12,7 +12,7 @@ This package is a standalone version of the grid provided as an chrome extension
 npm install css-gridish-grid -D
 ```
 
-## Use
+## Usage
 
 Recommended usage: 
 If you are using webpack or rollup for instance, you can wrap your code inside a `if(TRUE|FALSE) {}` block and get the grid automatically striped out from production build using tree-shaking
@@ -29,8 +29,8 @@ if (process.env.DEBUG) {
 
 A sample of the options that can be given on the constructor can be found in here: https://github.com/IBM/css-gridish/blob/master/examples/material/css-gridish.json
 
-The `init()` and `destroy()` methods are for easier hookups in a HOT-RELOAD environment, this giving you the ability to dispose the grid whenever appropriated.
+The `init()` and `destroy()` methods are for easier hookups in a HOT-MODULE-RELOAD environment, this gives you the ability to dispose the grid whenever appropriated.
 
 ## License
 
-[MIT](LICENSE) © [Rafael Milewski](LICENSE)
+[MIT](LICENSE) © [Rafael Milewski](https://github.com/milewski/css-gridish-grid/blob/master/LICENSE)
