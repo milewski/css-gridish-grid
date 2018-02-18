@@ -82,14 +82,14 @@ export default class Gridish {
 
     }
 
-    private show() {
+    public show() {
         if (!this.overlay.contains(this.columns)) {
             this.overlay.appendChild(this.columns)
             this.overlay.appendChild(this.rows)
         }
     }
 
-    private hide() {
+    public hide() {
         this.columns.remove()
         this.rows.remove()
     }
