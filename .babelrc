@@ -1,0 +1,15 @@
+{
+  "presets": [
+    [
+      "@babel/es2015",
+      {
+        "modules": "umd"
+      }
+    ]
+  ],
+  "plugins": [
+    "@babel/plugin-transform-typescript",
+    "@babel/plugin-proposal-class-properties",
+    "@babel/plugin-transform-classes"
+  ]
+}

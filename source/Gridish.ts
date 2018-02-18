@@ -1,57 +1,68 @@
-import { GridOptions } from './Interfaces'
+import { AdvancedBreakPoint, BreakPoint, GridOptions } from './Interfaces'
 
 export default class Gridish {
 
-    private checker = document.createElement('div')
-    private checkerStyle = document.createElement('style')
-    private grid = document.createElement('div')
-    private layout = document.createElement('div')
+    private overlay: HTMLDivElement
+    private styleSheet: CSSStyleSheet
+    private sortedBreakPoints: AdvancedBreakPoint[] = []
+    private columns: HTMLDivElement
+    private rows: HTMLDivElement
 
-    private options: GridOptions = {
-        prefix: 'bx',
+    private options: Partial<GridOptions> = {
+        prefix: 'grid',
+        rowHeight: 2,
         breakpoints: {
-            sm: {
+            small: {
                 breakpoint: 20,
-                columns: 12,
-                gutter: '1.250rem',
-                margin: '5vw'
+                columns: 4,
+                gutter: '20px',
+                margin: '0'
             },
-            xxl: {
-                breakpoint: 100,
+            medium: {
+                breakpoint: 64,
                 columns: 12,
-                gutter: '1.250rem',
-                margin: '5vw'
+                gutter: '20px',
+                margin: '0px'
             }
         },
-        extraArtboards: {
-            md: 48,
-            lg: 62,
-            xl: 75
-        },
         rem: 16,
-        rowHeight: 0.5,
         rows: 30,
-        paths: {
-            intro: 'intro.md'
+        settings: {
+            rows: {
+                fontSize: '0.6em',
+                fontFamily: 'sans-serif',
+                color: 'darkturquoise',
+                borderBottom: '1px solid darkturquoise'
+            },
+            columns: {
+                borderLeft: '1px solid darkturquoise',
+                borderRight: '1px solid darkturquoise',
+                backgroundColor: 'rgba(0,206,209, .2)'
+            }
         }
     }
 
     private listener: (event: KeyboardEvent) => void
 
     constructor(options: Partial<GridOptions> = {}) {
-
         this.options = { ...this.options, ...options }
-
-        this.checker.className = 'css-gridish-checker'
-        this.checker.appendChild(this.checkerStyle)
-        this.grid.className = 'css-gridish-checker__grid'
-        this.layout.className = 'css-gridish-checker__layout'
-
     }
 
     public init() {
+
         document.addEventListener('keydown', this.listener = (event) => { this.toggleChecker(event) }, false)
-        this.createGrid(this.options)
+
+        this.overlay = document.createElement('div')
+        this.overlay.classList.add(this.options.prefix)
+        this.overlay.style.height = document.body.scrollHeight + 'px'
+        this.sortedBreakPoints = this.sortBreakPoints(this.options.breakpoints)
+
+        this.styleSheet = document.head.appendChild(document.createElement('style')).sheet as CSSStyleSheet
+
+        document.body.insertBefore(this.overlay, document.body.firstChild)
+
+        this.createGrid()
+
     }
 
     public destroy() {
@@ -61,149 +72,209 @@ export default class Gridish {
         }
 
         document.removeEventListener('keydown', this.listener, false)
-        document.body.removeChild(this.checker)
-        this.grid.remove()
-        this.layout.remove()
+        document.body.removeChild(this.overlay)
+        this.columns.remove()
+        this.rows.remove()
         this.listener = null
 
-    }
-
-    private baseStyles(): string {
-
-        return `
-            .css-gridish-checker {
-                left: 0;
-                height: 100vh !important;
-                margin: 0 auto;
-                pointer-events: none;
-                position: fixed;
-                right: 0;
-                top: 0;
-                width: 100vw !important;
-                z-index: 9999;
-            }
-
-            .css-gridish-checker__grid,
-            .css-gridish-checker__layout {
-                height: 100%;
-                position: absolute;
-                width: 100%;
-            }
-
-            .css-gridish-checker__grid {
-                background: linear-gradient(to right, #c0c6cd 1px, transparent 1px),
-                linear-gradient(to bottom, #c0c6cd 1px, transparent 1px);
-            }
-
-            .css-gridish-checker__layout {
-                box-sizing: border-box;
-                display: flex;
-            }
-
-            .css-gridish-checker__layout__col {
-                background: #b8c1c1;
-                display: none;
-                flex: 1;
-                opacity: 0.75;
-            }
-        `
+        this.columns = null
+        this.rows = null
 
     }
 
-    private createColumn(breakpoint: string): HTMLDivElement {
-        const col = document.createElement('div')
-        col.className = 'css-gridish-checker__layout__col css-gridish-checker__layout__col--' + breakpoint
-        return col
+    private show() {
+        if (!this.overlay.contains(this.columns)) {
+            this.overlay.appendChild(this.columns)
+            this.overlay.appendChild(this.rows)
+        }
     }
 
-    private createGrid(gridConfig: GridOptions) {
-
-        this.checkerStyle.innerHTML = this.baseStyles()
-        this.grid.innerHTML = ''
-        this.layout.innerHTML = ''
-
-        const [ largestBreakpoint ] = Object.values(gridConfig.breakpoints)
-            .map(breakpoint => breakpoint.breakpoint)
-            .sort((a, b) => a - b)
-            .slice(-1)
-
-        this.checker.setAttribute(
-            'style', `font-size: ${gridConfig.rem}px; max-width: ${largestBreakpoint}em;`
-        )
-
-        this.grid.setAttribute(
-            'style', `background-size: ${gridConfig.rowHeight}rem ${gridConfig.rowHeight}rem;`
-        )
-
-        const breakpoints = Object.values(gridConfig.breakpoints).map((item, index) => {
-            item.name = Object.keys(gridConfig.breakpoints)[ index ]
-            return item
-        }).sort((a, b) => a.breakpoint - b.breakpoint)
-
-        let previousBreakPoint = 0
-        let mediaQuery = 0
-
-        breakpoints.forEach(({ breakpoint, columns, name, margin, gutter }, index) => {
-
-            if (index > 0) {
-                previousBreakPoint = breakpoints[ index - 1 ].columns
-                mediaQuery = breakpoint
-            }
-
-            const newColumns = columns - previousBreakPoint
-
-            for (let j = 0; j < newColumns; j++) {
-                this.layout.appendChild(
-                    this.createColumn(name)
-                )
-            }
-
-            this.checkerStyle.innerHTML =
-                this.checkerStyle.innerHTML +
-                `
-			@media (min-width: ${mediaQuery}rem) {
-				.css-gridish-checker__layout {
-						padding: 0 ${margin};
-				}
-				.css-gridish-checker__layout__col {
-					margin: 0 ${parseInt(gutter, 10) / 2}${gutter.match(/[a-zA-Z]+/g)[ 0 ]};
-				}
-				.css-gridish-checker__layout__col--${name} {
-					display: initial;
-				}
-			}
-		`
-
-        })
-
+    private hide() {
+        this.columns.remove()
+        this.rows.remove()
     }
 
     private toggleChecker(event: KeyboardEvent) {
-
-        if (event.ctrlKey && event.keyCode === 71) {
-            if (!this.checker.contains(this.grid)) {
-                this.checker.appendChild(this.grid)
-            } else {
-                this.grid.remove()
-            }
-        }
-
         if (event.ctrlKey && event.keyCode === 76) {
-            if (!this.checker.contains(this.layout)) {
-                this.checker.appendChild(this.layout)
+            if (!this.overlay.contains(this.columns)) {
+                this.show()
             } else {
-                this.layout.remove()
+                this.hide()
             }
         }
+    }
 
-        if (event.ctrlKey && (event.keyCode === 71 || event.keyCode === 76)) {
-            if (this.checker.contains(this.grid) || this.checker.contains(this.layout)) {
-                document.body.appendChild(this.checker)
-            } else {
-                document.body.removeChild(this.checker)
+    private sortBreakPoints(breakpoints: { [key: string]: BreakPoint }): AdvancedBreakPoint[] {
+        return Object
+            .keys(breakpoints)
+            .map(name => ({
+                ...breakpoints[ name ], ...{
+                    name,
+                    gutter: this.parseUnit(breakpoints[ name ].gutter),
+                    margin: this.parseUnit(breakpoints[ name ].margin)
+                } as AdvancedBreakPoint
+            }))
+            .sort((a, b) => a.breakpoint - b.breakpoint)
+    }
+
+    private parseUnit(item: string): { value: number, unit: string } {
+
+        const [ _, value, unit = 'px' ] = /(\d+)(\w+)?/.exec(item)
+
+        return { value: parseInt(value, 10), unit }
+
+    }
+
+    private createGridColumns(): HTMLDivElement {
+
+        const container = document.createElement('div')
+        const { prefix } = this.options
+        container.classList.add(`${prefix}__columns`)
+
+        const { breakpoint: largestBreakpoint } = this.sortedBreakPoints[ this.sortedBreakPoints.length - 1 ]
+
+        this.insertRule(`.${prefix}`, {
+            fontSize: this.options.rem + 'px',
+            maxWidth: largestBreakpoint + 'rem',
+            width: '100vw',
+            margin: '0 auto',
+            pointerEvents: 'none',
+            position: 'absolute',
+            left: '0',
+            right: '0',
+            top: '0',
+            zIndex: '9999'
+        })
+        this.insertRule(`.${prefix}__columns`, {
+            display: 'flex',
+            boxSizing: 'border-box',
+            height: '100%',
+            width: '100%',
+            position: 'absolute'
+        })
+        this.insertRule(`.${prefix}__columns__item`, {
+            ...this.options.settings.columns,
+            display: 'none',
+            flex: '1'
+        })
+
+        this.sortedBreakPoints.forEach(({ breakpoint, columns, margin, name, gutter }, index) => {
+
+            const previousColumnsCount = index > 0 ? this.sortedBreakPoints[ index - 1 ].columns : 0
+            const newColumns = columns - previousColumnsCount
+
+            for (let i = 0; i < newColumns; i++) {
+                container.appendChild(this.createColumn(name))
             }
+
+            const rule = `
+                  @media (min-width: ${ index > 0 ? breakpoint : 0 }rem) {
+                        .${prefix}__columns {
+                            padding: 0 ${ margin.value }${ margin.unit };
+                        }          
+                        .${prefix}__columns__item {
+                            margin: 0 ${ gutter.value / 2 }${ gutter.unit };
+                        }                
+                        .${prefix}__columns__item.\\--${ name } {
+                            display: initial;
+                        }
+                    }
+                  `
+
+            this.styleSheet.insertRule(rule, index)
+
+        })
+
+        return container
+
+    }
+
+    private createGridRows(): HTMLDivElement {
+
+        const container = document.createElement('div')
+        const row = document.createElement('div')
+        const { prefix } = this.options
+
+        container.classList.add(`${prefix}__rows`)
+        row.classList.add(`${prefix}__row`)
+
+        const overlayHeight = this.overlay.scrollHeight
+
+        this.insertRule(`.${prefix}__row`, {
+            ...this.options.settings.rows,
+            height: this.options.rowHeight + 'rem',
+            boxSizing: 'border-box',
+            position: 'relative'
+        })
+
+        const { fontSize } = this.options.settings.rows
+
+        this.insertRule(`.${prefix}__row::before, .${prefix}__row::after`, {
+            content: 'attr(data-key)',
+            position: 'absolute',
+            width: '0',
+            top: `calc(${this.options.rowHeight / 2}rem - ${fontSize})`
+        })
+        this.insertRule(`.${prefix}__row::before`, { left: `-${fontSize}`, direction: 'rtl' })
+        this.insertRule(`.${prefix}__row::after`, { right: `-${fontSize}` })
+
+        const fragment = document.createDocumentFragment()
+
+        let count = Math.floor(overlayHeight / (this.options.rem * this.options.rowHeight))
+
+        const { breakpoint: latestBreakPoint } = this.sortedBreakPoints[ this.sortedBreakPoints.length - 1 ]
+
+        const rule = `
+                  @media (max-width: ${latestBreakPoint}rem) {
+                        .${prefix}__row::before {
+                            left: calc(${fontSize} * 4);
+                            direction: ltr;
+                        }
+                        .${prefix}__row::after {
+                            right: calc(${fontSize} * 4);
+                            direction: rtl;
+                        }
+                    }
+                  `
+
+        this.styleSheet.insertRule(rule, 9)
+
+        for (let i = 0; i < count; i++) {
+
+            const clone = row.cloneNode() as HTMLDivElement
+            clone.dataset.key = (i + 1).toString()
+
+            fragment.appendChild(clone)
+
         }
 
+        container.appendChild(fragment)
+
+        return container
+
+    }
+
+    private createGrid() {
+        this.columns = this.createGridColumns()
+        this.rows = this.createGridRows()
+    }
+
+    private createColumn(breakpoint: string): HTMLDivElement {
+        const column = document.createElement('div')
+        column.classList.add(`${this.options.prefix}__columns__item`, `--${breakpoint}`)
+        return column
+    }
+
+    private insertRule(name: string, style: Partial<CSSStyleDeclaration>) {
+        this.styleSheet.addRule(name, this.objectToCss(style))
+    }
+
+    private objectToCss(object) {
+        return Object.keys(object).map(item => `${this.camelCaseToHyphenCase(item)}: ${object[ item ]}`).join(';')
+    }
+
+    private camelCaseToHyphenCase(item) {
+        return item.replace(/([a-zA-Z])(?=[A-Z])/g, '$1-').toLowerCase()
     }
 
 }

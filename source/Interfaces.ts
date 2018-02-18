@@ -3,7 +3,12 @@ export type BreakPoint = {
     columns: number
     gutter: string
     margin: string
-    name?: string
+}
+
+export type AdvancedBreakPoint = BreakPoint & {
+    gutter: { value: number, unit: string }
+    margin: { value: number, unit: string }
+    name: string
 }
 
 export interface GridOptions {
@@ -11,11 +16,11 @@ export interface GridOptions {
     breakpoints: {
         [key: string]: BreakPoint
     },
-    extraArtboards: { [key: string]: number },
     rem: number,
     rowHeight: number,
     rows: number,
-    paths: {
-        intro?: string
+    settings: {
+        rows: Partial<CSSStyleDeclaration>
+        columns: Partial<CSSStyleDeclaration>
     }
 }

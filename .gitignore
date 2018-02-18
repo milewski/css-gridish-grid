@@ -7,3 +7,5 @@
 declaration
 distribution
 node_modules
+/dev/
+!dev/index.html
