@@ -13,16 +13,22 @@ export default class Gridish {
         rowHeight: 2,
         breakpoints: {
             small: {
-                breakpoint: 20,
-                columns: 4,
-                gutter: '20px',
-                margin: '0'
+                breakpoint: 47,
+                columns: 2,
+                gutter: '25px',
+                margin: 0
             },
             medium: {
                 breakpoint: 64,
                 columns: 12,
-                gutter: '20px',
-                margin: '0px'
+                gutter: '30px',
+                margin: 0
+            },
+            large: {
+                breakpoint: 90,
+                columns: 12,
+                gutter: '30px',
+                margin: 0
             }
         },
         rem: 16,
@@ -50,7 +56,7 @@ export default class Gridish {
 
     public init() {
 
-        document.addEventListener('keydown', this.listener = (event) => { this.toggleChecker(event) }, false)
+        document.addEventListener('keydown', this.listener = event => { this.toggleChecker(event) }, false)
 
         this.overlay = document.createElement('div')
         this.overlay.classList.add(this.options.prefix)
@@ -117,9 +123,9 @@ export default class Gridish {
             .sort((a, b) => a.breakpoint - b.breakpoint)
     }
 
-    private parseUnit(item: string): { value: number, unit: string } {
+    private parseUnit(item: string | number): { value: number, unit: string } {
 
-        const [ _, value, unit = 'px' ] = /(\d+)(\w+)?/.exec(item)
+        const [ _, value, unit = 'px' ] = /(\d+)(\w+)?/.exec(item.toString())
 
         return { value: parseInt(value, 10), unit }
 
@@ -140,6 +146,7 @@ export default class Gridish {
             margin: '0 auto',
             pointerEvents: 'none',
             position: 'absolute',
+            lineHeight: 'normal',
             left: '0',
             right: '0',
             top: '0',
@@ -237,12 +244,12 @@ export default class Gridish {
                     }
                   `
 
-        this.styleSheet.insertRule(rule, 9)
+        this.styleSheet.insertRule(rule, 10)
 
         for (let i = 0; i < count; i++) {
 
             const clone = row.cloneNode() as HTMLDivElement
-            clone.dataset.key = (i + 1).toString()
+            clone.dataset.key = ((i % this.options.rows) + 1).toString()
 
             fragment.appendChild(clone)
 

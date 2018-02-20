@@ -10,11 +10,12 @@
   ],
   "types": "declaration/Gridish.d.ts",
   "scripts": {
-    "prepublish": "npm run compile",
-    "precompile": "rm -rf distribution/ && rm -rf declaration/",
-    "compile": "LIB=Gridish MODULE_DIR=distribution/modules MAIN_DIR=distribution/main run-s compile:* prepare-distribution",
-    "compile:module": "tsc --module es2015 --target es2015 --outDir $MODULE_DIR && npm run minify -- -o $MODULE_DIR/$LIB.min.js -- $MODULE_DIR/$LIB.js",
-    "compile:main": "tsc --module commonjs --target es5 --outDir $MAIN_DIR && npm run minify -- -o $MAIN_DIR/$LIB.min.js -- $MAIN_DIR/$LIB.js",
+    "prepublish": "npm run build",
+    "prebuild": "rm -rf distribution/ && rm -rf declaration/",
+    "prestart": "css-gridish",
+    "build": "LIB=Gridish MODULE_DIR=distribution/modules MAIN_DIR=distribution/main run-s build:* prepare-distribution",
+    "build:module": "tsc --module es2015 --target es2015 --outDir $MODULE_DIR && npm run minify -- -o $MODULE_DIR/$LIB.min.js -- $MODULE_DIR/$LIB.js",
+    "build:main": "tsc --module commonjs --target es5 --outDir $MAIN_DIR && npm run minify -- -o $MAIN_DIR/$LIB.min.js -- $MAIN_DIR/$LIB.js",
     "prepare-distribution": "for file in distribution/**/*; do sed -i \"s/$LIB.js/${LIB,,}.js/gi\" $file && mv -v $file `echo ${file,,}`; done;",
     "minify": "uglifyjs --compress --mangle --source-map",
     "start": "babel source/Gridish.ts -x .ts --watch --out-file dev/Gridish.js --source-maps inline | http-server dev -o"

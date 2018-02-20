@@ -2,7 +2,7 @@ export type BreakPoint = {
     breakpoint: number
     columns: number
     gutter: string
-    margin: string
+    margin: number | string
 }
 
 export type AdvancedBreakPoint = BreakPoint & {
