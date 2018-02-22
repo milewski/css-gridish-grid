@@ -16,12 +16,15 @@
     "build": "LIB=Gridish MODULE_DIR=distribution/modules MAIN_DIR=distribution/main run-s build:* prepare-distribution",
     "build:module": "tsc --module es2015 --target es2015 --outDir $MODULE_DIR && npm run minify -- -o $MODULE_DIR/$LIB.min.js -- $MODULE_DIR/$LIB.js",
     "build:main": "tsc --module commonjs --target es5 --outDir $MAIN_DIR && npm run minify -- -o $MAIN_DIR/$LIB.min.js -- $MAIN_DIR/$LIB.js",
-    "prepare-distribution": "for file in distribution/**/*; do sed -i \"s/$LIB.js/${LIB,,}.js/gi\" $file && mv -v $file `echo ${file,,}`; done;",
+    "prepare-distribution": "for file in distribution/**/*; do sed -i '' \"s/$LIB.js/${LIB,,}.js/g\" $file && mv -v $file `echo ${file,,}`; done;",
     "minify": "uglifyjs --compress --mangle --source-map",
     "start": "babel source/Gridish.ts -x .ts --watch --out-file dev/Gridish.js --source-maps inline | http-server dev -o"
   },
   "author": "Rafael Milewski",
   "license": "MIT",
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org/"
+  },
   "devDependencies": {
     "@babel/cli": "^7.0.0-beta.40",
     "@babel/core": "^7.0.0-beta.40",
