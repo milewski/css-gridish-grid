@@ -51,7 +51,28 @@ export default class Gridish {
     private listener: (event: KeyboardEvent) => void
 
     constructor(options: Partial<GridOptions> = {}) {
-        this.options = { ...this.options, ...options }
+        this.options = { ...this.options, ...this.convertKeysToCamelCase(options) }
+    }
+
+    private convertKeysToCamelCase(object: { [key: string]: any }) {
+
+        const result = {}
+        const replacer = result => result[ 1 ].toUpperCase()
+
+        for (let key in object) {
+
+            const camelCased = key.replace(/-([a-z])/g, replacer)
+
+            if (typeof object[ key ] === 'object') {
+                result[ camelCased ] = this.convertKeysToCamelCase(object[ key ])
+                continue
+            }
+
+            result[ camelCased ] = object[ key ]
+        }
+
+        return result
+
     }
 
     public init() {
