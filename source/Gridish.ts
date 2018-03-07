@@ -3,11 +3,10 @@ import { AdvancedBreakPoint, BreakPoint, GridOptions } from './Interfaces'
 export default class Gridish {
 
     private overlay: HTMLDivElement
-    private styleSheet: CSSStyleSheet
     private sortedBreakPoints: AdvancedBreakPoint[] = []
     private columns: HTMLDivElement
     private rows: HTMLDivElement
-    private styles: HTMLStyleElement = document.createElement('style')
+    private styles: HTMLStyleElement
 
     private options: Partial<GridOptions> = {
         prefix: 'grid',
@@ -84,10 +83,10 @@ export default class Gridish {
 
         this.overlay = document.createElement('div')
         this.overlay.classList.add(this.options.prefix)
-        this.overlay.style.height = document.body.scrollHeight + 'px'
+        this.overlay.style.height = document.body.getBoundingClientRect().height + 'px'
+        this.overlay.style.position = 'absolute'
         this.sortedBreakPoints = this.sortBreakPoints(this.options.breakpoints)
-
-        this.styleSheet = document.head.appendChild(document.createElement('style')).sheet as CSSStyleSheet
+        this.styles = document.createElement('style')
 
         document.body.insertBefore(this.overlay, document.body.firstChild)
 
@@ -105,9 +104,11 @@ export default class Gridish {
 
         document.removeEventListener('keydown', this.listener, false)
         document.body.removeChild(this.overlay)
+
         this.columns.remove()
         this.rows.remove()
         this.listener = null
+        this.styles = null
 
         this.columns = null
         this.rows = null
