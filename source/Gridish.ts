@@ -7,28 +7,31 @@ export default class Gridish {
     private sortedBreakPoints: AdvancedBreakPoint[] = []
     private columns: HTMLDivElement
     private rows: HTMLDivElement
+    private styles: HTMLStyleElement = document.createElement('style')
 
     private options: Partial<GridOptions> = {
         prefix: 'grid',
-        rowHeight: 2,
         breakpoints: {
             small: {
                 breakpoint: 47,
                 columns: 2,
                 gutter: '25px',
-                margin: 0
+                margin: 0,
+                rowHeight: 2
             },
             medium: {
                 breakpoint: 64,
                 columns: 12,
                 gutter: '30px',
-                margin: 0
+                margin: 0,
+                rowHeight: 3
             },
             large: {
                 breakpoint: 90,
                 columns: 12,
                 gutter: '30px',
-                margin: 0
+                margin: 0,
+                rowHeight: 4
             }
         },
         rem: 16,
@@ -89,6 +92,8 @@ export default class Gridish {
         document.body.insertBefore(this.overlay, document.body.firstChild)
 
         this.createGrid()
+
+        this.overlay.appendChild(this.styles)
 
     }
 
@@ -173,6 +178,7 @@ export default class Gridish {
             top: '0',
             zIndex: '9999'
         })
+
         this.insertRule(`.${prefix}__columns`, {
             display: 'flex',
             boxSizing: 'border-box',
@@ -180,6 +186,7 @@ export default class Gridish {
             width: '100%',
             position: 'absolute'
         })
+
         this.insertRule(`.${prefix}__columns__item`, {
             ...this.options.settings.columns,
             display: 'none',
@@ -209,7 +216,7 @@ export default class Gridish {
                     }
                   `
 
-            this.styleSheet.insertRule(rule, index)
+            this.insertMedia(rule)
 
         })
 
@@ -217,6 +224,9 @@ export default class Gridish {
 
     }
 
+    /**
+     * Very Messy :( need a huge clean up
+     */
     private createGridRows(): HTMLDivElement {
 
         const container = document.createElement('div')
@@ -224,57 +234,101 @@ export default class Gridish {
         const { prefix } = this.options
 
         container.classList.add(`${prefix}__rows`)
-        row.classList.add(`${prefix}__row`)
+        row.classList.add(`${prefix}__row__item`)
 
         const overlayHeight = this.overlay.scrollHeight
 
-        this.insertRule(`.${prefix}__row`, {
-            ...this.options.settings.rows,
-            height: this.options.rowHeight + 'rem',
-            boxSizing: 'border-box',
-            position: 'relative'
-        })
-
         const { fontSize } = this.options.settings.rows
-
-        this.insertRule(`.${prefix}__row::before, .${prefix}__row::after`, {
-            content: 'attr(data-key)',
-            position: 'absolute',
-            width: '0',
-            top: `calc(${this.options.rowHeight / 2}rem - ${fontSize})`
-        })
-        this.insertRule(`.${prefix}__row::before`, { left: `-${fontSize}`, direction: 'rtl' })
-        this.insertRule(`.${prefix}__row::after`, { right: `-${fontSize}` })
 
         const fragment = document.createDocumentFragment()
 
-        let count = Math.floor(overlayHeight / (this.options.rem * this.options.rowHeight))
-
         const { breakpoint: latestBreakPoint } = this.sortedBreakPoints[ this.sortedBreakPoints.length - 1 ]
+
+        this.insertRule(`.${prefix}__row__item`, {
+            ...this.options.settings.rows,
+            boxSizing: 'border-box',
+            position: 'relative',
+            display: 'none'
+        })
+
+        this.insertRule(`.${prefix}__row__item::before, .${prefix}__row__item::after`, {
+            content: 'attr(data-key)',
+            position: 'absolute',
+            width: '0'
+        })
+
+        this.insertRule(`.${prefix}__row__item::before`, { left: `-${fontSize}`, direction: 'rtl' })
+        this.insertRule(`.${prefix}__row__item::after`, { right: `-${fontSize}` })
+
+        this.sortedBreakPoints.forEach(({ breakpoint, columns, margin, name, gutter, rowHeight }, index) => {
+
+            const rule = `
+                  @media (min-width: ${ index > 0 ? breakpoint : 0 }rem) {
+                        .${prefix}__row__item {
+                            height: ${rowHeight}rem;
+                            direction: ltr;
+                        }
+                        .${prefix}__row__item::before, .${prefix}__row__item::after{
+                            top: calc(${rowHeight / 2}rem - ${fontSize})
+                        }
+                    }
+                  `
+
+            this.insertMedia(rule)
+
+        })
+
+        let tracker = 0
+        const rows = []
+
+        this.sortedBreakPoints.sort((a, b) => b.rowHeight - a.rowHeight).forEach(({ name, rowHeight, breakpoint }, index, array) => {
+
+            const media = index > 0 ? `max-width: ${array[ index - 1 ].breakpoint}rem` : `min-width: 0px`
+
+            const rule2 = `
+                  @media (${media}) {
+                        .${prefix}__row__item.\\--${name} {
+                            display: block;
+                        }
+                  }
+                  `
+
+            this.insertMedia(rule2)
+
+            const count = Math.floor(overlayHeight / (this.options.rem * rowHeight))
+
+            const newColumns = count - tracker
+
+            tracker = count
+
+            for (let i = 0; i < newColumns; i++) {
+
+                const clone = row.cloneNode() as HTMLDivElement
+                clone.dataset.key = ((i % this.options.rows) + 1).toString()
+                clone.classList.add(`--${name}`)
+
+                rows.push(clone)
+
+            }
+
+        })
+
+        rows.forEach(row => fragment.appendChild(row))
 
         const rule = `
                   @media (max-width: ${latestBreakPoint}rem) {
-                        .${prefix}__row::before {
+                        .${prefix}__row__item::before {
                             left: calc(${fontSize} * 4);
                             direction: ltr;
                         }
-                        .${prefix}__row::after {
+                        .${prefix}__row__item::after {
                             right: calc(${fontSize} * 4);
                             direction: rtl;
                         }
                     }
                   `
 
-        this.styleSheet.insertRule(rule, 10)
-
-        for (let i = 0; i < count; i++) {
-
-            const clone = row.cloneNode() as HTMLDivElement
-            clone.dataset.key = ((i % this.options.rows) + 1).toString()
-
-            fragment.appendChild(clone)
-
-        }
+        this.insertMedia(rule)
 
         container.appendChild(fragment)
 
@@ -293,8 +347,12 @@ export default class Gridish {
         return column
     }
 
+    private insertMedia(rules: string) {
+        this.styles.innerHTML += rules
+    }
+
     private insertRule(name: string, style: Partial<CSSStyleDeclaration>) {
-        this.styleSheet.addRule(name, this.objectToCss(style))
+        this.styles.innerHTML += `${name} {${this.objectToCss(style)}}`
     }
 
     private objectToCss(object) {
