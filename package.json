@@ -1,6 +1,6 @@
 {
   "name": "css-gridish-grid",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Only the Grid from IBM/css-gridish as an NPM module",
   "main": "./distribution/main/gridish.min.js",
   "module": "./distribution/module/gridish.min.js",
