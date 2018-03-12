@@ -152,7 +152,7 @@ export default class Gridish {
 
     private parseUnit(item: string | number): { value: number, unit: string } {
 
-        const [ _, value, unit = 'px' ] = /(\d+)(\w+)?/.exec(item.toString())
+        const [ _, value, unit = 'rem' ] = /(\d+)(\w+)?/.exec(item.toString())
 
         return { value: parseInt(value, 10), unit }
 
@@ -202,7 +202,7 @@ export default class Gridish {
             for (let i = 0; i < newColumns; i++) {
                 container.appendChild(this.createColumn(name))
             }
-
+console.log(margin)
             const rule = `
                   @media (min-width: ${ index > 0 ? breakpoint : 0 }rem) {
                         .${prefix}__columns {
