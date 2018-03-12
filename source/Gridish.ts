@@ -169,7 +169,7 @@ export default class Gridish {
         this.insertRule(`.${prefix}`, {
             fontSize: this.options.rem + 'px',
             maxWidth: largestBreakpoint + 'rem',
-            width: '100vw',
+            width: '100%',
             margin: '0 auto',
             pointerEvents: 'none',
             position: 'absolute',
@@ -202,7 +202,7 @@ export default class Gridish {
             for (let i = 0; i < newColumns; i++) {
                 container.appendChild(this.createColumn(name))
             }
-console.log(margin)
+
             const rule = `
                   @media (min-width: ${ index > 0 ? breakpoint : 0 }rem) {
                         .${prefix}__columns {

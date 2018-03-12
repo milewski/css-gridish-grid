@@ -1,6 +1,6 @@
 {
   "name": "css-gridish-grid",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "description": "Only the Grid from IBM/css-gridish as an NPM module",
   "main": "./distribution/main/gridish.min.js",
   "module": "./distribution/module/gridish.min.js",
@@ -9,6 +9,9 @@
     "declaration/**/*.d.ts"
   ],
   "types": "declaration/Gridish.d.ts",
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org/"
+  },
   "scripts": {
     "prepublish": "npm run build",
     "prebuild": "rm -rf distribution/ && rm -rf declaration/",
