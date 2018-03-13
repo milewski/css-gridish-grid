@@ -1,6 +1,6 @@
 {
   "name": "css-gridish-grid",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "description": "Only the Grid from IBM/css-gridish as an NPM module",
   "main": "./distribution/main/gridish.min.js",
   "module": "./distribution/module/gridish.min.js",
@@ -25,9 +25,6 @@
   },
   "author": "Rafael Milewski",
   "license": "MIT",
-  "publishConfig": {
-    "registry": "https://registry.npmjs.org/"
-  },
   "devDependencies": {
     "@babel/cli": "^7.0.0-beta.40",
     "@babel/core": "^7.0.0-beta.40",

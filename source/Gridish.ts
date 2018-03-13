@@ -176,7 +176,7 @@ export default class Gridish {
             lineHeight: 'normal',
             left: '0',
             right: '0',
-            top: '0',
+            top: '1px',
             zIndex: '9999'
         })
 
