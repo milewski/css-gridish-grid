@@ -128,6 +128,13 @@ export default class Gridish {
     }
 
     private toggleChecker(event: KeyboardEvent) {
+        const source = (event.target as HTMLElement).tagName.toLowerCase()
+        /**
+         * Don't show grid if you are typing for example on form inputs
+         */
+        if ([ 'input', 'textarea', 'select' ].some(element => element === source)) {
+            return
+        }
         if (event.ctrlKey && event.keyCode === 76) {
             if (!this.overlay.contains(this.columns)) {
                 this.show()
