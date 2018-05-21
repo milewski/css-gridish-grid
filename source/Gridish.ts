@@ -7,8 +7,9 @@ export default class Gridish {
     private columns: HTMLDivElement
     private rows: HTMLDivElement
     private styles: HTMLStyleElement
+    private attachedToElement: HTMLElement
 
-    private options: Partial<GridOptions> = {
+    private readonly options: Partial<GridOptions> = {
         prefix: 'grid',
         breakpoints: {
             small: {
@@ -56,7 +57,7 @@ export default class Gridish {
         this.options = { ...this.options, ...this.convertKeysToCamelCase(options) }
     }
 
-    private convertKeysToCamelCase(object: { [key: string]: any }) {
+    private convertKeysToCamelCase(object: { [ key: string ]: any }) {
 
         const result = {}
         const replacer = result => result[ 1 ].toUpperCase()
@@ -77,23 +78,26 @@ export default class Gridish {
 
     }
 
-    public init() {
+    public init(element: HTMLElement = document.body) {
 
         document.addEventListener('keydown', this.listener = event => { this.toggleChecker(event) }, false)
 
         this.overlay = document.createElement('div')
         this.overlay.classList.add(this.options.prefix)
-        this.overlay.style.height = document.body.getBoundingClientRect().height + 'px'
+        this.overlay.style.height = element.getBoundingClientRect().height + 'px'
         this.overlay.style.position = 'absolute'
         this.sortedBreakPoints = this.sortBreakPoints(this.options.breakpoints)
         this.styles = document.createElement('style')
 
-        document.body.insertBefore(this.overlay, document.body.firstChild)
-
-        this.createGrid()
+        element.insertBefore(this.overlay, element.firstChild)
 
         this.overlay.appendChild(this.styles)
+        this.attachedToElement = element
 
+    }
+
+    public setOverlayHeight(height: number) {
+        this.overlay.style.height = height + 'px'
     }
 
     public destroy() {
@@ -103,7 +107,7 @@ export default class Gridish {
         }
 
         document.removeEventListener('keydown', this.listener, false)
-        document.body.removeChild(this.overlay)
+        this.attachedToElement.removeChild(this.overlay)
 
         this.columns.remove()
         this.rows.remove()
@@ -116,10 +120,14 @@ export default class Gridish {
     }
 
     public show() {
+
+        this.createGrid()
+
         if (!this.overlay.contains(this.columns)) {
             this.overlay.appendChild(this.columns)
             this.overlay.appendChild(this.rows)
         }
+
     }
 
     public hide() {
@@ -144,7 +152,7 @@ export default class Gridish {
         }
     }
 
-    private sortBreakPoints(breakpoints: { [key: string]: BreakPoint }): AdvancedBreakPoint[] {
+    private sortBreakPoints(breakpoints: { [ key: string ]: BreakPoint }): AdvancedBreakPoint[] {
         return Object
             .keys(breakpoints)
             .map(name => ({
